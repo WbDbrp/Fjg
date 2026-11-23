@@ -1,0 +1,771 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Feldjäger | Kompanie-Portal</title>
+<style>
+:root{--bg:#10150f;--panel:#1b2419;--panel2:#222d1e;--line:#3b4a32;--orange:#ff7417;--gold:#d6b45b;--text:#f4f1e8;--muted:#b9c0ae;--danger:#e45e4d;--shadow:0 14px 35px #0008}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 20% 0%,#34452a 0,#151d13 42%,#0d120d 100%);color:var(--text);font:15px/1.45 Inter,Segoe UI,Arial,sans-serif;min-height:100vh}
+button,input,select,textarea{font:inherit}button{cursor:pointer;border:1px solid var(--line);border-radius:9px;padding:9px 13px;background:#2a3624;color:var(--text);transition:.18s}button:hover{border-color:var(--orange);transform:translateY(-1px)}button.primary{background:var(--orange);border-color:var(--orange);color:#17130f;font-weight:800}button.ghost{background:transparent}button.danger{background:#49231f;border-color:#7d3930;color:#ffd8d2}
+header{height:78px;display:flex;align-items:center;justify-content:space-between;padding:0 26px;border-bottom:1px solid #536044;background:#121a11eF;position:sticky;top:0;z-index:10;backdrop-filter:blur(12px)}
+.brand{display:flex;align-items:center;gap:13px}.crest{width:43px;height:43px;border-radius:12px;background:linear-gradient(135deg,var(--orange) 0 48%,#27362b 49%);display:grid;place-items:center;font-size:23px;box-shadow:0 4px 14px #0006}.brand strong{display:block;letter-spacing:1.4px;font-size:18px}.brand small{color:var(--muted);letter-spacing:2px;font-size:10px}
+.topright{display:flex;align-items:center;gap:10px}.role-chip{border:1px solid #687654;padding:7px 11px;border-radius:30px;color:#e7d8ae;font-size:12px}
+.shell{max-width:1600px;margin:auto;padding:22px 24px 60px}.hero{display:flex;justify-content:space-between;align-items:flex-end;margin:8px 0 22px;gap:20px}.eyebrow{color:var(--orange);font-size:11px;font-weight:800;letter-spacing:2.5px;text-transform:uppercase}.hero h1{font-size:clamp(27px,4vw,43px);line-height:1.02;margin:8px 0 7px}.hero p{color:var(--muted);margin:0}.hero-actions{display:flex;gap:8px;flex-wrap:wrap}
+.tabs{display:flex;gap:4px;overflow:auto;border-bottom:2px solid var(--orange);margin-bottom:18px}.tab{white-space:nowrap;border:0;border-radius:9px 9px 0 0;background:transparent;color:#c4cbbd;padding:13px 17px;font-weight:700}.tab.active{background:#293522;color:var(--orange);box-shadow:inset 0 -3px var(--orange)}
+.notice{padding:11px 14px;border:1px solid #596747;background:#202b1c;border-radius:10px;color:#d7dfcc;margin-bottom:17px;font-size:13px}.notice b{color:#ffc27f}
+.panel{background:linear-gradient(145deg,#202a1d,#172016);border:1px solid var(--line);border-radius:15px;box-shadow:var(--shadow);padding:18px}.panel-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:15px}.panel h2{font-size:18px;margin:0}.panel h3{font-size:15px;margin:0 0 10px}.muted{color:var(--muted)}.small{font-size:12px}.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:15px}.span-12{grid-column:span 12}.span-8{grid-column:span 8}.span-6{grid-column:span 6}.span-4{grid-column:span 4}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}.stat{padding:15px;border:1px solid var(--line);background:#20291d;border-radius:12px}.stat strong{display:block;font-size:25px;color:var(--gold)}.stat span{color:var(--muted);font-size:12px}
+
+.org-canvas{position:relative;width:1472px;height:1100px;min-width:1472px;display:block;color:#171717}
+.org-canvas .org-title{position:absolute;left:18px;top:22px;z-index:2;font-size:37px;line-height:1.05;width:320px}
+.org-lines{position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+.org-canvas .positioned{position:absolute;width:240px;min-width:240px;max-width:240px;z-index:2}
+.org-canvas .positioned .rank{padding:6px 4px}
+.org-canvas .positioned .name{padding:5px 4px}
+.org-canvas .positioned button{font-size:10px}
+.org-unit-label{position:absolute;z-index:1;color:#fff;font-weight:900;font-size:14px;text-shadow:1px 2px 3px #222;white-space:nowrap}
+.org-crest{position:absolute;right:45px;top:30px;width:105px;height:118px;display:grid;place-items:center;background:linear-gradient(145deg,#ff7518 0 50%,#41494a 51%);clip-path:polygon(0 0,100% 0,100% 72%,50% 100%,0 72%);border:4px solid #ddd;color:#eaf5f8;font-size:48px;text-shadow:0 2px 4px #222;z-index:1}
+.org-wrap{overflow:auto;background:#b3b17a;border-radius:12px;min-height:560px;position:relative;padding:25px;background-image:linear-gradient(30deg,#56643d 12%,transparent 12.5%,transparent 87%,#56643d 87.5%),linear-gradient(150deg,#79663e 12%,transparent 12.5%,transparent 87%,#79663e 87.5%),linear-gradient(30deg,#9b955a 12%,transparent 12.5%,transparent 87%,#9b955a 87.5%);background-size:100px 175px;background-position:0 0,0 0,50px 87px}
+.org{min-width:900px;display:flex;flex-direction:column;align-items:center;gap:17px;color:#171717}.org-row{display:flex;justify-content:center;gap:18px;width:100%}.org-card{min-width:155px;max-width:205px;background:#d9d9d9;border:2px solid #161616;box-shadow:3px 4px 0 #0007;text-align:center;color:#171717}.org-card input{width:100%;border:0;border-top:1px solid #888;background:#f4f4f4;color:#161616;text-align:center;padding:5px 4px}.org-card .rank{font-weight:800;padding:7px 5px}.org-card .name{padding:5px;background:#eee;border-top:1px solid #aaa}.org-card button{margin:5px;font-size:11px;padding:4px 7px}.org-title{font-size:31px;font-weight:900;color:#fff;text-shadow:2px 3px #333;align-self:flex-start;margin:4px 0 0 15px}.org-title em{color:#ff6812;font-style:normal}.section-label{color:#fff;font-weight:900;text-shadow:1px 2px #222;margin:4px 0}
+.field{display:flex;flex-direction:column;gap:5px;margin-bottom:11px}.field label{font-size:12px;color:#c6cfba;font-weight:700}.field input,.field select,.field textarea{width:100%;background:#11190f;border:1px solid #4a5a3e;border-radius:8px;color:var(--text);padding:10px;outline:none}.field input:focus,.field textarea:focus,.field select:focus{border-color:var(--orange)}.field textarea{min-height:90px;resize:vertical}
+.row{display:flex;gap:9px;align-items:center;flex-wrap:wrap}.row>*{flex:1}.toolbar{display:flex;gap:8px;flex-wrap:wrap}.table-wrap{overflow:auto}table{width:100%;border-collapse:collapse;min-width:580px}th,td{text-align:left;padding:11px 10px;border-bottom:1px solid #3b4933}th{color:#d5bd80;font-size:11px;text-transform:uppercase;letter-spacing:1px}td{font-size:13px}.pill{display:inline-block;padding:3px 8px;border-radius:20px;background:#34442c;color:#dce7d2;font-size:11px}.empty{padding:35px;text-align:center;color:var(--muted);border:1px dashed #506044;border-radius:10px}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}.member-card,.doc-card{padding:15px;border:1px solid var(--line);background:#202a1d;border-radius:12px}.member-card strong,.doc-card strong{display:block;margin-bottom:4px}.member-card .meta{color:var(--muted);font-size:12px;margin-bottom:10px}
+.permission-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid #394631}.permission-row:last-child{border:0}.permission-row small{display:block;color:var(--muted)}
+.modal-backdrop{position:fixed;inset:0;background:#000a;display:none;place-items:center;padding:18px;z-index:30}.modal-backdrop.show{display:grid}.modal{width:min(560px,100%);max-height:90vh;overflow:auto;background:#1c2619;border:1px solid #647451;border-radius:16px;padding:20px;box-shadow:0 25px 80px #000b}.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}.modal-head h2{margin:0;font-size:19px}
+footer{text-align:center;color:#87917e;font-size:11px;padding:25px 10px}
+.divider{height:1px;background:#394631;margin:15px 0}.hidden{display:none!important}
+@media(max-width:850px){.shell{padding:15px}.hero{align-items:flex-start;flex-direction:column}.stats{grid-template-columns:repeat(2,1fr)}.span-8,.span-6,.span-4{grid-column:span 12}header{padding:0 14px}.role-chip{display:none}}
+
+/* Portal-Erweiterung */
+.feature-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}.feature-card{background:#151e16;border:1px solid #354532;border-radius:14px;padding:16px}.feature-card h3{margin:0 0 8px}.feature-card p{color:#aab7a4;font-size:13px}.feature-card input,.feature-card select,.feature-card textarea,.feature-card button,.wide-input{max-width:100%}.feature-card input,.feature-card select,.feature-card textarea{width:100%;background:#0e160f;border:1px solid #465640;border-radius:8px;color:#f2f5ef;padding:10px;margin:5px 0}.feature-list{display:grid;gap:9px}.feature-row{background:#111a12;border:1px solid #354532;border-radius:10px;padding:12px;display:flex;gap:12px;justify-content:space-between;align-items:center;flex-wrap:wrap}.feature-row small{color:#aab7a4}.tag{display:inline-block;padding:4px 8px;border-radius:20px;background:#31452b;color:#d9edcf;font-size:11px}.danger-tag{background:#542b25;color:#ffd5ca}.test-question{padding:16px;border:1px solid #3c4d38;border-radius:12px;margin:12px 0;background:#111a12}.test-question label{display:block;padding:7px 10px;margin:5px 0;border-radius:7px;background:#1b281c;cursor:pointer}.test-question label:hover{background:#263a26}.feature-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.feature-muted{color:#9daa96;font-size:12px}.metric{font-size:28px;font-weight:800;color:#e5c58c}.feature-card button{margin:3px}.chat-log{max-height:380px;overflow:auto;display:grid;gap:8px;padding:10px;background:#0c130d;border-radius:10px}.chat-msg{padding:10px;border-radius:10px;background:#202d20;max-width:90%}.chat-msg.mine{margin-left:auto;background:#344b31}.hidden{display:none!important}
+
+
+/* Organigramm – visuelle Überarbeitung */
+.org-wrap{
+  padding:28px;
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(105,128,75,.22), transparent 55%),
+    linear-gradient(135deg,#18251b,#101810 65%,#1b281c);
+  border:1px solid #566849;
+  box-shadow:inset 0 0 50px #0006;
+}
+.org-canvas{
+  background:
+    linear-gradient(180deg,rgba(25,38,27,.97),rgba(16,25,18,.98));
+  border:1px solid #71805c;
+  border-radius:20px;
+  box-shadow:0 18px 45px #0009,inset 0 1px 0 #ffffff18;
+  overflow:hidden;
+}
+.org-canvas:before{
+  content:"DBRP  •  DEUTSCHES BUNDESWEHR ROLEPLAY";
+  position:absolute;left:22px;top:142px;
+  color:#c6d0b7;font-size:10px;font-weight:800;letter-spacing:3px;
+}
+.org-canvas .org-title{
+  left:28px;top:24px;width:auto;
+  color:#f5f3e9;font-size:30px;line-height:1.08;
+  letter-spacing:1.5px;text-shadow:0 3px 12px #000;
+  padding-left:17px;border-left:5px solid #d7a64b;
+}
+.org-canvas .org-title em{color:#e8a84d}
+.org-crest{
+  right:42px;top:24px;width:82px;height:92px;
+  background:linear-gradient(145deg,#dca44b 0 49%,#35483a 50%);
+  border:2px solid #e8d6a4;filter:drop-shadow(0 8px 12px #0008);
+  font-size:36px;
+}
+.org-lines path{
+  stroke:#d4b36b!important;stroke-width:3!important;
+  stroke-linecap:round;stroke-linejoin:round;opacity:.88;
+}
+.org-card.positioned{
+  width:220px;min-width:220px;max-width:220px;
+  border:1px solid #b8c49d;
+  border-radius:11px;overflow:hidden;
+  background:linear-gradient(180deg,#f1f0e6,#d8ddcf);
+  box-shadow:0 7px 17px #0008,0 0 0 3px #26382a;
+  transition:transform .18s ease,box-shadow .18s ease;
+}
+.org-card.positioned:hover{
+  transform:translateY(-3px);
+  box-shadow:0 12px 22px #000a,0 0 0 3px #d7a64b;
+}
+.org-card.positioned .rank{
+  min-height:38px;display:flex;align-items:center;justify-content:center;
+  padding:8px 9px;background:linear-gradient(135deg,#334a37,#1c3024);
+  color:#fff;font-size:12px;font-weight:900;letter-spacing:.45px;
+  text-transform:uppercase;border-bottom:2px solid #d5a34c;
+}
+.org-card.positioned .name{
+  min-height:31px;padding:7px 8px;background:#e9ecdf;
+  color:#263329;font-size:13px;font-weight:700;
+}
+.org-card.positioned button{
+  margin:6px 8px 8px;padding:5px 9px;
+  color:#fff;background:#344b37;border:1px solid #637a5b;
+  border-radius:6px;font-size:10px;
+}
+.org-unit-label{
+  color:#f5e7c4;font-size:12px;font-weight:900;
+  letter-spacing:1px;text-shadow:0 2px 5px #000;
+  padding:5px 10px;border:1px solid #9a804c;border-radius:6px;
+  background:linear-gradient(90deg,#354936,#243427);
+  box-shadow:0 4px 10px #0006;
+}
+@media(max-width:850px){
+ .org-wrap{padding:12px}
+ .org-canvas .org-title{font-size:25px}
+}
+
+
+/* FINAL FIX: Organigramm als echte Hierarchie statt überlappender Absolutpositionen */
+.org-wrap{
+  overflow:auto!important;
+  min-height:0!important;
+  padding:clamp(10px,2vw,24px)!important;
+  background:radial-gradient(ellipse at top,#354a35 0%,#18251b 58%,#101810 100%)!important;
+  border:1px solid #53694b!important;
+}
+#org.org-canvas{
+  position:relative!important;
+  inset:auto!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:stretch!important;
+  gap:20px!important;
+  width:100%!important;
+  min-width:0!important;
+  max-width:1500px!important;
+  height:auto!important;
+  min-height:0!important;
+  margin:0 auto!important;
+  padding:clamp(12px,2vw,28px)!important;
+  overflow:visible!important;
+  color:#172219!important;
+  background:linear-gradient(145deg,#1d2d21,#111b14)!important;
+  border:1px solid #637653!important;
+  border-radius:14px!important;
+  box-shadow:0 16px 40px #0008!important;
+}
+#org.org-canvas .org-heading{
+  position:relative!important;
+  display:flex!important;
+  flex-direction:column!important;
+  gap:7px!important;
+  padding:0 0 14px 15px!important;
+  border-left:5px solid #d6a64d!important;
+}
+#org .org-kicker{
+  order:2!important;
+  color:#b9c7b2!important;
+  font-size:9px!important;
+  font-weight:800!important;
+  letter-spacing:2px!important;
+}
+#org .org-main-title{
+  order:1!important;
+  color:#f4f1e6!important;
+  font-size:clamp(23px,3vw,34px)!important;
+  font-weight:900!important;
+  line-height:1.1!important;
+  letter-spacing:1px!important;
+}
+#org .org-main-title span{color:#e5a84d!important}
+#org .org-panel{
+  position:relative!important;
+  min-width:0!important;
+  padding:13px!important;
+  border:1px solid #586d4d!important;
+  border-radius:11px!important;
+  background:linear-gradient(155deg,#293c2c,#1a291e)!important;
+  box-shadow:0 6px 16px #0005!important;
+}
+#org .org-panel h3{
+  margin:0 0 12px!important;
+  padding:0 0 9px!important;
+  color:#efd9a6!important;
+  font-size:12px!important;
+  font-weight:900!important;
+  letter-spacing:1px!important;
+  text-align:center!important;
+  border-bottom:1px solid #7e7049!important;
+}
+#org .org-command{
+  width:min(440px,100%)!important;
+  align-self:center!important;
+}
+#org .org-support{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) minmax(0,1.15fr) minmax(0,1fr)!important;
+  gap:14px!important;
+  align-items:start!important;
+}
+#org .org-platoons{
+  display:grid!important;
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:14px!important;
+  align-items:start!important;
+}
+#org .org-stack{
+  display:grid!important;
+  grid-template-columns:1fr!important;
+  gap:8px!important;
+}
+#org .org-card,
+#org.org-canvas .org-card.positioned,
+#org.org-canvas .positioned{
+  position:relative!important;
+  inset:auto!important;
+  left:auto!important;
+  top:auto!important;
+  right:auto!important;
+  bottom:auto!important;
+  transform:none!important;
+  float:none!important;
+  display:block!important;
+  width:100%!important;
+  min-width:0!important;
+  max-width:none!important;
+  margin:0!important;
+  overflow:hidden!important;
+  border:1px solid #aab99a!important;
+  border-radius:8px!important;
+  background:#e7eadc!important;
+  box-shadow:0 3px 9px #0005!important;
+  text-align:center!important;
+  color:#263329!important;
+  z-index:1!important;
+}
+#org .org-card .rank{
+  padding:8px 6px!important;
+  color:#fff!important;
+  background:linear-gradient(110deg,#3b563e,#263b2b)!important;
+  border-bottom:2px solid #d5a34c!important;
+  font-size:10px!important;
+  font-weight:900!important;
+  letter-spacing:.4px!important;
+  text-transform:uppercase!important;
+  overflow-wrap:anywhere!important;
+}
+#org .org-card .name{
+  min-height:30px!important;
+  padding:7px 6px!important;
+  color:#263329!important;
+  background:#e9ecdf!important;
+  border:0!important;
+  font-size:12px!important;
+  font-weight:700!important;
+  overflow-wrap:anywhere!important;
+}
+#org .org-card button{
+  margin:5px!important;
+  padding:4px 8px!important;
+  color:#fff!important;
+  background:#344b37!important;
+  border:1px solid #637a5b!important;
+  border-radius:5px!important;
+  font-size:10px!important;
+}
+#org .org-groups{
+  display:grid!important;
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:8px!important;
+  margin-top:12px!important;
+}
+#org .org-group{
+  display:grid!important;
+  align-content:start!important;
+  gap:6px!important;
+  min-width:0!important;
+  padding:8px!important;
+  border:1px solid #4e6348!important;
+  border-radius:8px!important;
+  background:#17251b!important;
+}
+#org .org-group-title{
+  min-height:27px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  color:#e9c77c!important;
+  font-size:10px!important;
+  font-weight:900!important;
+  text-align:center!important;
+}
+#org .org-inspections{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:7px!important;
+  margin-top:12px!important;
+  padding-top:10px!important;
+  border-top:1px solid #61734f!important;
+}
+#org .org-subtitle{
+  grid-column:1/-1!important;
+  color:#e9c77c!important;
+  font-size:10px!important;
+  font-weight:900!important;
+  letter-spacing:1px!important;
+  text-align:center!important;
+}
+@media(max-width:850px){
+  #org .org-support{grid-template-columns:1fr!important}
+  #org .org-platoons{grid-template-columns:1fr!important}
+  #org .org-groups{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}
+@media(max-width:480px){
+  #org .org-groups{grid-template-columns:1fr!important}
+  #org .org-inspections{grid-template-columns:1fr!important}
+}
+
+</style>
+</head>
+<body>
+<header><div class="brand"><div class="crest">⚔</div><div><strong>FELDJÄGER</strong><small>KOMPANIE-PORTAL</small></div></div><div class="topright"><span class="role-chip" id="roleChip">Nicht angemeldet</span><span id="authUser" class="small muted"></span><button class="primary" id="loginBtn" onclick="showLogin()">Anmelden</button><button class="ghost hidden" id="logoutBtn" onclick="logoutLocal()">Abmelden</button></div></header>
+<main class="shell">
+<section class="hero"><div><div class="eyebrow">Führung · Organisation · Verwaltung</div><h1>Kompanie-Portal</h1><p>Digitale Verwaltung der Feldjäger-Kompanie · Offline-Version</p></div><div class="hero-actions"><button class="ghost" id="redeemCodeBtn" onclick="redeemRoleCode()">Rollen-Code einlösen</button><button class="ghost" onclick="exportData()">Daten exportieren</button><button class="primary" onclick="saveAll()">Änderungen speichern</button></div></section>
+<div class="notice"><b>Hinweis:</b> Anmeldung mit Discord-Namen. Neue Konten starten als Gast. Rollen werden über persönliche Einmal-Codes freigeschaltet.</div>
+<nav class="tabs" id="tabs">
+<button class="tab active" data-tab="org">Organigramm</button><button class="tab" data-tab="members">Mitglieder</button><button class="tab" data-tab="requests">Dienstanträge</button><button class="tab" data-tab="vehicles">Fahraufträge</button><button class="tab" data-tab="manuals">Handbücher</button><button class="tab" data-tab="permissions">Berechtigungen</button><button class="tab" data-tab="reports">Berichte & Logs</button><button class="tab" data-tab="tickets">Beschwerden</button><button class="tab" data-tab="quota">Wochenquote</button><button class="tab" data-tab="strikes">Strikes</button><button class="tab" data-tab="tests">Theorieprüfung</button><button class="tab" data-tab="driving">Fahrprüfung B</button><button class="tab" data-tab="ksk">KSK-Aufgaben</button><button class="tab" data-tab="links">Links & Anmeldung</button>
+</nav>
+<section id="view-org"><div class="panel" style="margin-bottom:15px"><div class="panel-head"><div><h2>Aktive Portal-Mitglieder</h2><div class="muted small">Lokale Anzeige auf diesem Gerät</div></div><span class="pill" id="onlineCount">0 online</span></div><div class="cards" id="onlineMembers"><div class="muted small">Anmeldung erforderlich.</div></div></div>
+<div class="stats"><div class="stat"><strong id="statMembers">0</strong><span>Mitglieder erfasst</span></div><div class="stat"><strong id="statUnits">3</strong><span>Organisationszüge</span></div><div class="stat"><strong id="statRequests">0</strong><span>Offene Dienstanträge</span></div><div class="stat"><strong id="statDocs">0</strong><span>Handbücher</span></div></div>
+<div class="panel"><div class="panel-head"><div><h2>Organigramm – Feldjäger</h2><div class="muted small">Einträge anklicken, um Namen und Dienststellung zu bearbeiten.</div></div><div class="toolbar"><button onclick="addOrgNode()">+ Stelle</button><button onclick="resetOrg()">Zurücksetzen</button><button class="primary" onclick="downloadOrg()">Als PNG speichern</button></div></div><div class="org-wrap"><div class="org" id="org"></div></div></div>
+</section>
+<section id="view-members" class="hidden"><div class="panel"><div class="panel-head"><div><h2>Mitgliederverwaltung</h2><div class="muted small">Personalübersicht der Kompanie</div></div><button class="primary" onclick="openMember()">+ Mitglied hinzufügen</button></div><div class="row" style="margin-bottom:14px"><input id="memberSearch" placeholder="Mitglied suchen …" oninput="renderMembers()" style="background:#11190f;border:1px solid #4a5a3e;border-radius:8px;color:white;padding:10px"><select id="memberFilter" onchange="renderMembers()" style="background:#11190f;border:1px solid #4a5a3e;border-radius:8px;color:white;padding:10px"><option value="">Alle Dienstgrade</option><option>Mannschaften</option><option>Unteroffiziere</option><option>Offiziere</option></select></div><div class="table-wrap"><table><thead><tr><th>Name</th><th>Dienstgrad</th><th>Einheit</th><th>Status</th><th>Aktion</th></tr></thead><tbody id="memberRows"></tbody></table></div></div>
+<div class="panel" style="margin-top:15px"><div class="panel-head"><div><h2>Portal-Mitglieder</h2><div class="muted small">Anmeldungen auf diesem Gerät</div></div><button onclick="refreshMembers()">Aktualisieren</button></div><div class="table-wrap"><table><thead><tr><th>Discord-Name</th><th>Portalrolle</th><th>Status</th><th>Letzte Aktivität</th></tr></thead><tbody id="portalMemberRows"><tr><td colspan="4">Lade Mitglieder …</td></tr></tbody></table></div></div>
+<div class="panel" id="codePanel" style="margin-top:15px"><div class="panel-head"><div><h2>Unterrollen-Codes erstellen</h2><div class="muted small">Erstelle Einmal-Codes und gib sie an die entsprechenden Mitglieder weiter.</div></div></div><div class="row"><div class="field"><label>Zielrolle</label><select id="codeRole"><option>Stellv. Kompanieführung</option><option>Kompaniefeldwebel</option><option>Personalabteilung</option><option>Personenschutzleitung</option><option>Personenschutz</option><option>Free Feldjäger</option><option>Zugführung</option><option>Feldjäger</option></select></div><div style="align-self:end"><button class="primary" onclick="createRoleCode()">Code erstellen</button></div></div><div id="newCodeResult" class="notice hidden" style="margin-top:12px"></div><p class="muted small">Jeder Code kann nur einmal eingelöst werden. Den Chef-Code nicht weitergeben.</p></div>
+</section>
+<section id="view-requests" class="hidden"><div class="panel"><div class="panel-head"><div><h2>Dienstanträge</h2><div class="muted small">Anträge erfassen, prüfen und bearbeiten</div></div><button class="primary" onclick="openRequest()">+ Antrag erstellen</button></div><div class="table-wrap"><table><thead><tr><th>Antragsteller</th><th>Art</th><th>Begründung</th><th>Datum</th><th>Status</th><th>Aktion</th></tr></thead><tbody id="requestRows"></tbody></table></div></div></section>
+<section id="view-vehicles" class="hidden">
+<div class="panel">
+ <div class="panel-head"><div><h2>Fahraufträge & Fahrzeugbewegungen</h2><div class="muted small">Erfassen, wer mit welchem Fahrzeug die Kaserne verlässt und wann die Rückkehr erfolgt.</div></div><button class="primary" onclick="openVehicle()">+ Fahrauftrag erstellen</button></div>
+ <div class="stats" style="grid-template-columns:repeat(3,1fr)">
+  <div class="stat"><strong id="vehiclePending">0</strong><span>Offene Aufträge</span></div>
+  <div class="stat"><strong id="vehicleOut">0</strong><span>Aktuell außer Haus</span></div>
+  <div class="stat"><strong id="vehicleReturned">0</strong><span>Zurückgekehrt</span></div>
+ </div>
+ <div class="row" style="margin-bottom:14px">
+  <input id="vehicleSearch" placeholder="Name, Fahrzeug oder Ziel suchen …" oninput="renderVehicles()" style="background:#11190f;border:1px solid #4a5a3e;border-radius:8px;color:white;padding:10px">
+  <select id="vehicleFilter" onchange="renderVehicles()" style="background:#11190f;border:1px solid #4a5a3e;border-radius:8px;color:white;padding:10px"><option value="">Alle Status</option><option>Beantragt</option><option>Genehmigt</option><option>Unterwegs</option><option>Zurückgekehrt</option><option>Abgelehnt</option></select>
+ </div>
+ <div class="table-wrap"><table><thead><tr><th>Fahrer / Einheit</th><th>Fahrzeug</th><th>Ziel / Zweck</th><th>Ausfahrt</th><th>Rückkehr</th><th>Status</th><th>Aktionen</th></tr></thead><tbody id="vehicleRows"></tbody></table></div>
+ <p class="muted small" style="margin-top:13px">Hinweis: Ein Auftrag wird zunächst beantragt. Die zuständige Führung kann ihn genehmigen. Bei tatsächlicher Abfahrt wird „Unterwegs“ gesetzt; bei Rückkehr wird der Auftrag abgeschlossen.</p>
+</div>
+</section>
+<section id="view-manuals" class="hidden"><div class="panel"><div class="panel-head"><div><h2>Handbücher & Vorschriften</h2><div class="muted small">Interne Dokumente und Ausbildungsunterlagen</div></div><button class="primary" onclick="openDoc()">+ Handbuch anlegen</button></div><div class="cards" id="docCards"></div></div></section>
+<section id="view-permissions" class="hidden"><div class="grid"><div class="panel span-6"><h2>Rollen & Zugriffsrechte</h2><button class="primary" onclick="createPortalRole()">+ Rolle erstellen</button><p class="muted small">Lege fest, welche Portalbereiche eine Rolle sehen und bearbeiten darf.</p><div id="permissionEditor"></div><button class="primary" style="margin-top:14px" onclick="savePermissions()">Berechtigungen speichern</button></div><div class="panel span-6"><h2>Aktuelle Sitzung</h2><p class="muted small">Wähle eine Rolle, um die Ansicht zu testen.</p><div class="field"><label>Angemeldete Rolle (Demo)</label><select id="activeRole" onchange="setRole(this.value)"><option>Kompanieführung</option><option>Stellv. Kompanieführung</option><option>Zugführung</option><option>Feldjäger</option><option>Gast</option></select></div><div class="notice">Diese Rollenumschaltung ist nur eine Vorschau. Sie ersetzt keine echte Anmeldung und schützt Daten nicht vor Zugriff über den Browser.</div><button onclick="resetData()" class="danger">Alle lokalen Beispieldaten zurücksetzen</button></div></div></section>
+<footer>OFFLINE-VERSION · Daten bleiben in diesem Browser. Nutze „Daten exportieren“ für Sicherungen. · FELDJÄGER · KOMPANIE-PORTAL <span>© 2026</span> · Interne Verwaltungsoberfläche</footer>
+</main>
+<div class="modal-backdrop show" id="loginOverlay"><div class="modal"><div class="modal-head"><h2>Portal-Anmeldung</h2></div><p class="muted small">Melde dich mit deinem Konto an oder erstelle ein neues. Neue Konten starten mit der Rolle Gast.</p><div class="field"><label>Benutzername (z. B. Discord-Name)</label><input id="loginName" maxlength="32" placeholder="Benutzername" autocomplete="username"></div><div class="field"><label>Passwort</label><input id="loginPass" type="password" placeholder="Passwort" autocomplete="current-password" onkeydown="if(event.key==='Enter')login()"></div><button class="primary" style="width:100%" onclick="login()">Anmelden</button><div id="loginError" class="small" style="color:#ff9c86;margin-top:10px"></div><div class="divider"></div><label class="small" style="display:flex;gap:8px;align-items:flex-start;cursor:pointer"><input type="checkbox" id="fjTerms" style="width:auto;margin-top:3px"><span>Ich stimme zu: Dies ist ein fiktives Rollenspiel-Portal ohne echte Behörde. Ich gebe keine echten personenbezogenen Daten und keine rechtswidrigen Inhalte ein und nutze ein Passwort, das ich nirgends sonst verwende.</span></label><button class="ghost" style="width:100%;margin-top:8px" onclick="registerAccount()">Konto erstellen</button><p class="muted small">Hast du einen Rollen-Code? Melde dich an und löse ihn danach im Portal ein.</p></div></div>
+<div class="modal-backdrop" id="modal"><div class="modal"><div class="modal-head"><h2 id="modalTitle">Bearbeiten</h2><button onclick="closeModal()">✕</button></div><div id="modalBody"></div></div></div>
+<script>
+const defaultsOrg=[
+{section:"Führung",items:[["KpChef","King"],["Stellv. KpChef","Ben"],["KpEinsOffz","Fortbildung Benötigt"]]},
+{section:"Kompaniefeldwebel",items:[["KpFw","Nick"],["KpTrpFhr","Fabio"]]},
+{section:"OvD / UvD",items:[["OvD","/"],["OvD","/"],["UvD","/"],["UvD","/"]]},
+{section:"Personal",items:[["PersFw","/"],["PersAbt","/"],["PersAbt","/"],["PersAbt","/"],["PersAbt","/"],["PersAbt","/"],["PersAbt","/"],["PersAbt","/"]]},
+{section:"I. Zug Alpha",items:[["ZgFhr","/"],["Stellv. ZgFhr","/"]]},
+{section:"I. Zug Alpha – Gruppen",items:[["CRC A1","/"],["Grpfhr","/"],["Stellv. Grpfhr","/"],["Erh/Erm A2","/"],["Grpfhr","/"],["Stellv. Grpfhr","/"],["GGSV A3","/"],["Grpfhr","/"],["Stellv. Grpfhr","/"]]},
+{section:"II. Zug Bravo",items:[["ZgFhr","/"],["Stellv. ZgFhr","/"]]},
+{section:"II. Zug Bravo – Gruppen",items:[["ZugDrs B1","/"],["Grpfhr","/"],["Stellv. Grpfhr","/"],["ZugDrs B2","/"],["Grpfhr","/"],["Stellv. Grpfhr","/"]]},
+{section:"III. Zug AusbZg",items:[["ZgFhr","/"],["Stellv. ZgFhr","/"]]},
+{section:"III. Zug AusbZg – Gruppen",items:[["PersSch B3","/"],["Grpfhr","/"],["Stellv. Grpfhr","/"]]},
+{section:"III. Zug AusbZg – Inspektionen",items:[["1. Insp [CRC]","/"],["2. Insp [PersSch]","/"],["3. Insp [ZugDrs]","/"],["4. Insp [Erh/Erm]","/"],["5. Insp (GefGut-/SchwWerk)","/"]]}
+];
+const defaultPerms={"Kompanieführung":{org:true,members:true,requests:true,vehicles:true,manuals:true,permissions:true,edit:true},"Stellv. Kompanieführung":{org:true,members:true,requests:true,vehicles:true,manuals:true,permissions:false,edit:true},"Zugführung":{org:true,members:true,requests:true,vehicles:true,manuals:true,permissions:false,edit:false},"Feldjäger":{org:true,members:false,requests:true,vehicles:true,manuals:false,permissions:false,edit:false},"Free Feldjäger":{org:true,members:true,requests:true,vehicles:true,manuals:true,permissions:false,edit:false},"Kompaniefeldwebel":{org:true,members:true,requests:true,vehicles:true,manuals:true,permissions:false,edit:true},"Personalabteilung":{org:true,members:true,requests:true,vehicles:true,manuals:false,permissions:false,edit:true},"Personenschutzleitung":{org:true,members:true,requests:false,vehicles:true,manuals:true,permissions:false,edit:true},"Personenschutz":{org:true,members:false,requests:false,vehicles:true,manuals:false,permissions:false,edit:false},"Gast":{org:false,members:true,requests:false,vehicles:true,manuals:false,permissions:false,edit:false}};
+let state=load(),role="Gast",currentEdit=null;
+if(state.orgLayoutVersion!==2){state.org=JSON.parse(JSON.stringify(defaultsOrg));state.orgLayoutVersion=2;localStorage.setItem("fjPortal",JSON.stringify(state));}
+
+function load(){try{return JSON.parse(localStorage.getItem("fjPortal"))||{org:defaultsOrg,members:[],requests:[],docs:[{title:"Feldjäger-Dienstvorschrift",category:"Vorschrift",content:"Grundlagen des Feldjägerdienstes, Aufgabenbereiche und allgemeine Verhaltensregeln."},{title:"Ausbildungsleitfaden",category:"Ausbildung",content:"Theorie, Praxis und Ausbildungsabläufe der Kompanie."}],vehicles:[],perms:defaultPerms,reports:[],tickets:[],quotas:[],strikes:[],tasks:[],links:[],applications:[],testResults:[],drivingResults:[],audit:[],kskRules:""}}catch(e){return {org:defaultsOrg,members:[],requests:[],docs:[],perms:defaultPerms}}}
+function toast(t){let n=document.createElement("div");n.textContent=t;n.style="position:fixed;bottom:22px;right:22px;background:#f4771a;color:#17130f;padding:12px 18px;border-radius:9px;font-weight:800;z-index:50;box-shadow:0 8px 30px #0008";document.body.append(n);setTimeout(()=>n.remove(),2300)}
+function allowed(tab){return !!(((state.perms[role]||{})[tab] ?? (defaultPerms[role]||defaultPerms.Gast)[tab]))}
+function editable(){return !!(state.perms[role]||{}).edit}
+function setRole(r){role=r;document.getElementById("roleChip").textContent="Rolle: "+r;const ar=document.getElementById("activeRole");if(ar)ar.value=r;renderTabs();renderAll()}
+document.getElementById("roleBtn")?.remove();
+const allTabs=["org","members","requests","vehicles","manuals","permissions","reports","tickets","quota","strikes","tests","driving","ksk","links"];
+document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{if(!allowed(b.dataset.tab)){toast("Für diesen Bereich hast du keine Berechtigung.");return}document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("active",x===b));allTabs.forEach(t=>document.getElementById("view-"+t)?.classList.toggle("hidden",t!==b.dataset.tab));});
+function renderTabs(){
+ document.querySelectorAll(".tab").forEach(b=>b.classList.toggle("hidden",!allowed(b.dataset.tab)));
+ const tabs=[...document.querySelectorAll(".tab")];
+ let active=tabs.find(b=>b.classList.contains("active")&&allowed(b.dataset.tab));
+ if(!active) active=tabs.find(b=>allowed(b.dataset.tab));
+ if(active){
+  tabs.forEach(b=>b.classList.toggle("active",b===active));
+  allTabs.forEach(t=>document.getElementById("view-"+t)?.classList.toggle("hidden",t!==active.dataset.tab));
+ }
+}
+function renderAll(){state.reports??=[];state.tickets??=[];state.quotas??=[];state.strikes??=[];state.tasks??=[];state.links??=[];state.applications??=[];state.testResults??=[];state.drivingResults??=[];state.kskRules??="Noch keine KSK-Regeln hinterlegt.";renderOrg();renderMembers();renderRequests();renderVehicles();renderDocs();renderPermissions();renderFeatures();document.getElementById("statMembers").textContent=state.members.length;document.getElementById("statRequests").textContent=state.requests.filter(x=>x.status==="Offen").length;document.getElementById("statDocs").textContent=state.docs.length}
+function renderOrg(){
+ const root=document.getElementById("org");
+ root.className="org org-canvas";
+ root.replaceChildren();
+
+ const findSection=(name)=>state.org.find(x=>x.section===name)?.items||[];
+ const card=(section,item,index)=>{
+  const el=document.createElement("article");
+  el.className="org-card";
+  const rank=document.createElement("div");
+  rank.className="rank";
+  rank.textContent=item?.[0]||"Unbesetzt";
+  const name=document.createElement("div");
+  name.className="name";
+  name.textContent=item?.[1]||"/";
+  el.append(rank,name);
+  if(editable()){
+   const btn=document.createElement("button");
+   btn.type="button";
+   btn.textContent="Bearbeiten";
+   btn.addEventListener("click",()=>editOrg(state.org.find(x=>x.section===section),index));
+   el.append(btn);
+  }
+  return el;
+ };
+ const makeStack=(section)=>{
+  const stack=document.createElement("div");
+  stack.className="org-stack";
+  findSection(section).forEach((item,i)=>stack.append(card(section,item,i)));
+  return stack;
+ };
+ const makePanel=(heading,extraClass="")=>{
+  const panel=document.createElement("section");
+  panel.className="org-panel "+extraClass;
+  const h=document.createElement("h3");
+  h.textContent=heading;
+  panel.append(h);
+  return panel;
+ };
+ const makeGroups=(section,names)=>{
+  const wrap=document.createElement("div");
+  wrap.className="org-groups";
+  const items=findSection(section);
+  for(let i=0;i<items.length;i+=3){
+   const group=document.createElement("div");
+   group.className="org-group";
+   const groupName=document.createElement("div");
+   groupName.className="org-group-title";
+   groupName.textContent=names[Math.floor(i/3)]||items[i]?.[0]||"Gruppe";
+   group.append(groupName);
+   items.slice(i,i+3).forEach((item,j)=>group.append(card(section,item,i+j)));
+   wrap.append(group);
+  }
+  return wrap;
+ };
+
+ const heading=document.createElement("div");
+ heading.className="org-heading";
+ heading.innerHTML='<div class="org-kicker">DBRP · DEUTSCHES BUNDESWEHR ROLEPLAY</div><div class="org-main-title">ORGANIGRAMM – <span>FELDJÄGER</span></div>';
+ root.append(heading);
+
+ const command=makePanel("KOMPANIEFÜHRUNG","org-command");
+ command.append(makeStack("Führung"));
+ root.append(command);
+
+ const support=document.createElement("div");
+ support.className="org-support";
+ const duty=makePanel("OvD / UvD");
+ duty.append(makeStack("OvD / UvD"));
+ const company=makePanel("KOMPANIEFELDWEBEL");
+ company.append(makeStack("Kompaniefeldwebel"));
+ const personnel=makePanel("PERSONAL");
+ personnel.append(makeStack("Personal"));
+ support.append(duty,company,personnel);
+ root.append(support);
+
+ const platoons=document.createElement("div");
+ platoons.className="org-platoons";
+
+ const alpha=makePanel("I. ZUG ALPHA");
+ alpha.append(makeStack("I. Zug Alpha"));
+ alpha.append(makeGroups("I. Zug Alpha – Gruppen",["CRC A1","Erh/Erm A2","GGSV A3"]));
+
+ const bravo=makePanel("II. ZUG BRAVO");
+ bravo.append(makeStack("II. Zug Bravo"));
+ bravo.append(makeGroups("II. Zug Bravo – Gruppen",["ZugDrs B1","ZugDrs B2"]));
+
+ const training=makePanel("III. ZUG AUSBILDUNGSZUG");
+ training.append(makeStack("III. Zug AusbZg"));
+ training.append(makeGroups("III. Zug AusbZg – Gruppen",["PersSch B3"]));
+ const inspections=findSection("III. Zug AusbZg – Inspektionen");
+ if(inspections.length){
+  const insp=document.createElement("div");
+  insp.className="org-inspections";
+  const subTitle=document.createElement("div");
+  subTitle.className="org-subtitle";
+  subTitle.textContent="INSPEKTIONEN";
+  insp.append(subTitle);
+  inspections.forEach((item,i)=>insp.append(card("III. Zug AusbZg – Inspektionen",item,i)));
+  training.append(insp);
+ }
+ platoons.append(alpha,bravo,training);
+ root.append(platoons);
+}
+function editOrg(section,i){openModal("Organigramm-Stelle bearbeiten",`<div class="field"><label>Dienststellung</label><input id="oRank" value="${esc(section.items[i][0])}"></div><div class="field"><label>Name / Besetzung</label><input id="oName" value="${esc(section.items[i][1])}"></div><div class="toolbar"><button class="primary" onclick="saveOrgEdit('${esc(section.section)}',${i})">Speichern</button><button class="danger" onclick="deleteOrg('${esc(section.section)}',${i})">Entfernen</button></div>`)}
+function saveOrgEdit(s,i){let x=state.org.find(x=>x.section===s);x.items[i]=[document.getElementById("oRank").value,document.getElementById("oName").value];closeModal();saveAll()}
+function deleteOrg(s,i){let x=state.org.find(x=>x.section===s);x.items.splice(i,1);closeModal();saveAll()}
+function addOrgNode(){if(!editable())return toast("Keine Bearbeitungsrechte.");openModal("Neue Organigramm-Stelle",`<div class="field"><label>Bereich</label><input id="oSection" placeholder="z. B. I. Zug Alpha"></div><div class="field"><label>Dienststellung</label><input id="oRank" placeholder="z. B. Gruppenführer"></div><div class="field"><label>Name</label><input id="oName" placeholder="Name oder /"></div><button class="primary" onclick="createOrg()">Hinzufügen</button>`)}
+function createOrg(){let s=document.getElementById("oSection").value.trim();if(!s)return toast("Bereich fehlt.");let g=state.org.find(x=>x.section===s);if(!g){g={section:s,items:[]};state.org.push(g)}g.items.push([document.getElementById("oRank").value,document.getElementById("oName").value]);closeModal();saveAll()}
+function resetOrg(){if(confirm("Organigramm auf Ausgangsstand zurücksetzen?")){state.org=JSON.parse(JSON.stringify(defaultsOrg));saveAll()}}
+function openMember(i=null){if(!editable())return toast("Keine Bearbeitungsrechte.");let m=i===null?{name:"",rank:"",unit:"",status:"Aktiv"}:state.members[i];currentEdit=i;openModal(i===null?"Mitglied hinzufügen":"Mitglied bearbeiten",`<div class="field"><label>Name</label><input id="mName" value="${esc(m.name)}"></div><div class="field"><label>Dienstgrad</label><input id="mRank" value="${esc(m.rank)}" placeholder="z. B. Feldwebel"></div><div class="field"><label>Einheit</label><input id="mUnit" value="${esc(m.unit)}" placeholder="z. B. I. Zug Alpha"></div><div class="field"><label>Status</label><select id="mStatus">${["Aktiv","Inaktiv","Beurlaubt"].map(x=>`<option ${m.status===x?"selected":""}>${x}</option>`).join("")}</select></div><button class="primary" onclick="saveMember()">Speichern</button>`)}
+function saveMember(){let m={name:mName.value.trim(),rank:mRank.value.trim(),unit:mUnit.value.trim(),status:mStatus.value};if(!m.name)return toast("Bitte einen Namen eintragen.");if(currentEdit===null)state.members.push(m);else state.members[currentEdit]=m;closeModal();saveAll()}
+function renderMembers(){let q=(document.getElementById("memberSearch")?.value||"").toLowerCase(),f=document.getElementById("memberFilter")?.value||"";let rows=state.members.map((m,i)=>({...m,i})).filter(m=>(m.name+" "+m.rank+" "+m.unit).toLowerCase().includes(q)&&(!f|| (f==="Mannschaften"?/schütze|gefreiter|obergefreiter/i.test(m.rank):f==="Unteroffiziere"?/unteroffizier|feldwebel|stabs/i.test(m.rank):/leutnant|hauptmann|major|oberst/i.test(m.rank))));document.getElementById("memberRows").innerHTML=rows.length?rows.map(m=>`<tr><td><b>${esc(m.name)}</b></td><td>${esc(m.rank)}</td><td>${esc(m.unit)}</td><td><span class="pill">${esc(m.status)}</span></td><td>${editable()?`<button onclick="openMember(${m.i})">Bearbeiten</button> <button class="danger" onclick="removeMember(${m.i})">✕</button>`:"—"}</td></tr>`).join(""):'<tr><td colspan="5" class="empty">Noch keine Mitglieder eingetragen.</td></tr>'}
+function removeMember(i){if(confirm("Mitglied wirklich entfernen?")){state.members.splice(i,1);saveAll()}}
+function openRequest(){openModal("Dienstantrag erstellen",`<div class="field"><label>Antragsteller</label><input id="rName" placeholder="Name"></div><div class="field"><label>Art des Antrags</label><select id="rType"><option>Urlaubsantrag</option><option>Versetzungsantrag</option><option>Beförderungsantrag</option><option>Sonstiges</option></select></div><div class="field"><label>Begründung</label><textarea id="rReason"></textarea></div><button class="primary" onclick="createRequest()">Antrag einreichen</button>`)}
+function createRequest(){if(!rName.value.trim())return toast("Name fehlt.");state.requests.push({name:rName.value,type:rType.value,reason:rReason.value,date:new Date().toLocaleDateString("de-DE"),status:"Offen"});closeModal();saveAll()}
+function renderRequests(){document.getElementById("requestRows").innerHTML=state.requests.length?state.requests.map((r,i)=>`<tr><td>${esc(r.name)}</td><td>${esc(r.type)}</td><td>${esc(r.reason)}</td><td>${r.date}</td><td><span class="pill">${r.status}</span></td><td>${editable()?`<button onclick="requestStatus(${i},'Genehmigt')">Genehmigen</button> <button onclick="requestStatus(${i},'Abgelehnt')">Ablehnen</button>`:"—"}</td></tr>`).join(""):'<tr><td colspan="6" class="empty">Noch keine Dienstanträge vorhanden.</td></tr>'}
+function requestStatus(i,s){state.requests[i].status=s;saveAll()}
+
+function openVehicle(){
+ currentEdit=null;
+ openModal("Fahrauftrag erstellen",`<div class="field"><label>Fahrer / Antragsteller</label><input id="vDriver" placeholder="Vor- und Nachname"></div>
+ <div class="field"><label>Einheit</label><input id="vUnit" placeholder="z. B. I. Zug Alpha"></div>
+ <div class="field"><label>Fahrzeug / Kennung</label><input id="vCar" placeholder="z. B. Streifenwagen 01"></div>
+ <div class="field"><label>Fahrziel / Zweck</label><input id="vDestination" placeholder="Ziel oder Grund der Fahrt"></div>
+ <div class="row"><div class="field"><label>Geplante Ausfahrt</label><input id="vOut" type="datetime-local"></div><div class="field"><label>Geplante Rückkehr</label><input id="vBack" type="datetime-local"></div></div>
+ <div class="field"><label>Mitfahrende / Bemerkung (optional)</label><textarea id="vNotes" placeholder="Weitere Insassen oder Hinweise"></textarea></div>
+ <button class="primary" onclick="createVehicle()">Fahrauftrag beantragen</button>`);
+}
+function createVehicle(){
+ const driver=document.getElementById("vDriver").value.trim(),car=document.getElementById("vCar").value.trim(),destination=document.getElementById("vDestination").value.trim();
+ if(!driver||!car||!destination)return toast("Bitte Fahrer, Fahrzeug und Ziel ausfüllen.");
+ if(!state.vehicles)state.vehicles=[];
+ state.vehicles.unshift({id:Date.now(),driver,unit:document.getElementById("vUnit").value.trim(),car,destination,out:document.getElementById("vOut").value,back:document.getElementById("vBack").value,notes:document.getElementById("vNotes").value.trim(),status:"Beantragt",created:new Date().toLocaleString("de-DE"),actualOut:"",actualBack:""});
+ closeModal();saveAll();document.querySelector('[data-tab="vehicles"]').click();
+}
+function renderVehicles(){
+ if(!state.vehicles)state.vehicles=[];
+ const q=(document.getElementById("vehicleSearch")?.value||"").toLowerCase(),f=document.getElementById("vehicleFilter")?.value||"";
+ const list=state.vehicles.filter(v=>(v.driver+" "+v.unit+" "+v.car+" "+v.destination).toLowerCase().includes(q)&&(!f||v.status===f));
+ document.getElementById("vehiclePending").textContent=state.vehicles.filter(v=>v.status==="Beantragt").length;
+ document.getElementById("vehicleOut").textContent=state.vehicles.filter(v=>v.status==="Unterwegs").length;
+ document.getElementById("vehicleReturned").textContent=state.vehicles.filter(v=>v.status==="Zurückgekehrt").length;
+ document.getElementById("vehicleRows").innerHTML=list.length?list.map(v=>{
+  const i=state.vehicles.indexOf(v),fmt=x=>x?new Date(x).toLocaleString("de-DE",{dateStyle:"short",timeStyle:"short"}):"—";
+  let actions="";
+  if(editable()){
+   if(v.status==="Beantragt")actions+=`<button onclick="vehicleStatus(${i},'Genehmigt')">Genehmigen</button> <button class="danger" onclick="vehicleStatus(${i},'Abgelehnt')">Ablehnen</button>`;
+   if(v.status==="Genehmigt")actions+=`<button class="primary" onclick="vehicleDepart(${i})">Abfahrt bestätigen</button>`;
+   if(v.status==="Unterwegs")actions+=`<button class="primary" onclick="vehicleReturn(${i})">Rückkehr bestätigen</button>`;
+   actions+=` <button class="danger" onclick="deleteVehicle(${i})">Löschen</button>`;
+  } else if(v.status==="Beantragt" && v.driver===localStorage.getItem("fjMemberName")) actions+=`<span class="muted">Wartet auf Genehmigung</span>`;
+  return `<tr><td><b>${esc(v.driver)}</b><br><span class="muted small">${esc(v.unit||"—")}</span></td><td>${esc(v.car)}</td><td>${esc(v.destination)}${v.notes?`<br><span class="muted small">${esc(v.notes)}</span>`:""}</td><td>${fmt(v.actualOut||v.out)}</td><td>${fmt(v.actualBack||v.back)}</td><td><span class="pill">${esc(v.status)}</span></td><td>${actions||"—"}</td></tr>`;
+ }).join(""):'<tr><td colspan="7" class="empty">Keine Fahraufträge gefunden.</td></tr>';
+}
+function vehicleStatus(i,s){state.vehicles[i].status=s;saveAll()}
+function vehicleDepart(i){state.vehicles[i].status="Unterwegs";state.vehicles[i].actualOut=new Date().toISOString();saveAll();toast("Abfahrt wurde erfasst.")}
+function vehicleReturn(i){state.vehicles[i].status="Zurückgekehrt";state.vehicles[i].actualBack=new Date().toISOString();saveAll();toast("Rückkehr wurde erfasst.")}
+function deleteVehicle(i){if(confirm("Diesen Fahrauftrag wirklich löschen?")){state.vehicles.splice(i,1);saveAll()}}
+
+function openDoc(i=null){if(!editable())return toast("Keine Bearbeitungsrechte.");let d=i===null?{title:"",category:"Ausbildung",content:""}:state.docs[i];currentEdit=i;openModal(i===null?"Handbuch anlegen":"Handbuch bearbeiten",`<div class="field"><label>Titel</label><input id="dTitle" value="${esc(d.title)}"></div><div class="field"><label>Kategorie</label><input id="dCat" value="${esc(d.category)}"></div><div class="field"><label>Link zum Handbuch (Google Docs, Drive, PDF usw.)</label><input id="dUrl" type="url" placeholder="https://…" value="${esc(d.url||"")}"></div><div class="field"><label>Inhalt / Beschreibung</label><textarea id="dContent" style="min-height:180px">${esc(d.content)}</textarea></div><button class="primary" onclick="saveDoc()">Speichern</button>`)}
+function saveDoc(){if(!dTitle.value.trim())return toast("Titel fehlt.");let d={title:dTitle.value,category:dCat.value,content:dContent.value,url:(document.getElementById("dUrl")?.value||"").trim()};if(currentEdit===null)state.docs.push(d);else state.docs[currentEdit]=d;closeModal();saveAll()}
+function renderDocs(){document.getElementById("docCards").innerHTML=state.docs.length?state.docs.map((d,i)=>`<article class="doc-card"><span class="pill">${esc(d.category)}</span><h3 style="margin-top:10px">${esc(d.title)}</h3><p class="muted small">${esc(d.content).slice(0,180)}${d.content.length>180?"…":""}</p><div class="toolbar"><button onclick="viewDoc(${i})">Details</button>${d.url?`<button class="primary" onclick="openDocLink(${i})">Handbuch öffnen ↗</button>`:""}${editable()?`<button onclick="openDoc(${i})">Bearbeiten</button><button class="danger" onclick="deleteDoc(${i})">Löschen</button>`:""}</div></article>`).join(""):'<div class="empty">Noch keine Handbücher hinterlegt.</div>'}
+function viewDoc(i){let d=state.docs[i];openModal(d.title,`<span class="pill">${esc(d.category)}</span><p style="white-space:pre-wrap;line-height:1.7">${esc(d.content)}</p>${d.url?`<p><a href="${esc(d.url)}" target="_blank" rel="noopener" style="color:#ff9a4d">Handbuch-Link öffnen ↗</a></p>`:"<p class='muted small'>Noch kein externer Link hinterlegt.</p>"}`)}
+function openDocLink(i){const u=state.docs[i].url;if(!u)return;try{const parsed=new URL(u);if(!["http:","https:"].includes(parsed.protocol))throw new Error();window.open(parsed.href,"_blank","noopener")}catch(e){toast("Bitte einen gültigen http(s)-Link hinterlegen.")}}
+function deleteDoc(i){if(confirm("Handbuch löschen?")){state.docs.splice(i,1);saveAll()}}
+function renderPermissions(){let root=document.getElementById("permissionEditor");root.innerHTML=Object.entries(state.perms).map(([r,p])=>`<div style="padding:12px 0;border-bottom:1px solid #394631"><b>${r}</b>${["org","members","requests","vehicles","manuals","permissions","edit","reports","tickets","quota","strikes","tests","driving","ksk","links"].map(k=>`<label class="permission-row"><span>${({org:"Organigramm",members:"Mitglieder",requests:"Dienstanträge",vehicles:"Fahraufträge",manuals:"Handbücher",permissions:"Berechtigungen verwalten",edit:"Daten bearbeiten",reports:"Berichte & Logs",tickets:"Beschwerden einsehen",quota:"Wochenquote verwalten",strikes:"Strikes verwalten",tests:"Theorieprüfung",driving:"Fahrprüfung",ksk:"KSK-Aufgaben",links:"Linksammlung"})[k]}</span><input type="checkbox" data-role="${r}" data-key="${k}" ${p[k]?"checked":""}></label>`).join("")}</div>`).join("")}
+function savePermissions(){document.querySelectorAll("#permissionEditor input").forEach(x=>state.perms[x.dataset.role][x.dataset.key]=x.checked);saveAll();renderTabs();toast("Berechtigungen aktualisiert.")}
+function resetData(){if(confirm("Alle lokalen Daten einschließlich Mitglieder und Dokumente löschen?")){localStorage.removeItem("fjPortal");state=load();saveAll()}}
+function exportData(){let blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="feldjaeger-portal-daten.json";a.click();URL.revokeObjectURL(a.href)}
+function downloadOrg(){let cards=[...document.querySelectorAll(".org-card")];let w=1200,h=Math.max(650,Math.ceil(cards.length/5)*100+180),svg=`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}"><rect width="100%" height="100%" fill="#26351f"/><text x="40" y="55" fill="#ff7417" font-size="34" font-family="Arial" font-weight="bold">ORGANIGRAMM – FELDJÄGER</text>`;cards.forEach((c,i)=>{let x=35+(i%5)*230,y=95+Math.floor(i/5)*105;svg+=`<rect x="${x}" y="${y}" width="200" height="75" fill="#ddd" stroke="#111" stroke-width="3"/><text x="${x+100}" y="${y+28}" text-anchor="middle" font-family="Arial" font-size="17" fill="#111">${xml(c.querySelector(".rank").textContent)}</text><text x="${x+100}" y="${y+55}" text-anchor="middle" font-family="Arial" font-size="15" fill="#111">${xml(c.querySelector(".name").textContent)}</text>`});svg+="</svg>";let img=new Image(),url=URL.createObjectURL(new Blob([svg],{type:"image/svg+xml"}));img.onload=()=>{let cv=document.createElement("canvas");cv.width=w;cv.height=h;cv.getContext("2d").drawImage(img,0,0);let a=document.createElement("a");a.download="feldjaeger-organigramm.png";a.href=cv.toDataURL("image/png");a.click();URL.revokeObjectURL(url)};img.src=url}
+function xml(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function openModal(t,b){document.getElementById("modalTitle").textContent=t;document.getElementById("modalBody").innerHTML=b;document.getElementById("modal").classList.add("show")}
+function closeModal(){document.getElementById("modal").classList.remove("show")}
+document.getElementById("modal").addEventListener("click",e=>{if(e.target.id==="modal")closeModal()});
+function saveOrgEditSafe(){}
+
+function showLogin(){document.getElementById("loginOverlay").classList.add("show");}
+const canEdit=()=>editable();const isChief=()=>role==="Kompanieführung";
+function canTab(k){return k==='tickets'?!!((state.perms[role]||{}).tickets):!!((state.perms[role]||{})[k]??(defaultPerms[role]||{} )[k]);}
+function stamp(){return new Date().toLocaleString("de-DE")}
+function logAction(action,detail=""){state.audit??=[];state.audit.unshift({action,detail,by:window.currentUsername||role,at:stamp()});state.audit=state.audit.slice(0,150)}
+function needEdit(){if(!canEdit()){toast("Keine Schreibberechtigung für deine Rolle.");return false}return true}
+function renderFeatures(){
+ const rows=(id,arr,fn)=>{const el=document.getElementById(id);if(el)el.innerHTML=arr.length?arr.map(fn).join(""):'<div class="feature-muted">Noch keine Einträge vorhanden.</div>'};
+ rows('reportsList',state.reports??[],(x,i)=>`<div class="feature-row"><div><b>${esc(x.title)}</b><div><small>${esc(x.category)} · ${esc(x.by)} · ${esc(x.at)}</small></div><div>${esc(x.body)}</div></div>${canEdit()?`<button class="danger" onclick="deleteItem('reports',${i})">Löschen</button>`:''}</div>`);
+ rows('auditList',state.audit??[],x=>`<div class="feature-row"><div><b>${esc(x.action)}</b><div><small>${esc(x.by)} · ${esc(x.at)}</small></div><div>${esc(x.detail)}</div></div></div>`);
+ const visible=(state.tickets??[]).filter(t=>t.author===window.currentUsername||!!(state.perms[role]||{}).tickets||isChief());
+ rows('ticketList',visible,(t)=>`<div class="feature-row"><div><b>#${t.id} · ${esc(t.title)}</b><div><small>${esc(t.author)} · ${esc(t.at)} · ${esc(t.status)}</small></div><div>${esc(t.description)}</div></div><div class="feature-actions"><button onclick="openTicket('${t.id}')">Chat öffnen</button>${canEdit()?`<button onclick="closeTicket('${t.id}')">${t.status==='Geschlossen'?'Wieder öffnen':'Schließen'}</button>`:''}</div></div>`);
+ rows('quotaList',state.quotas??[],(q,i)=>`<div class="feature-row"><div><b>${esc(q.member)}</b><div><small>KW ${esc(q.week)} · ${esc(q.hours)} Ingame-Stunden · Ziel ${esc(q.target)} h</small></div><span class="tag ${Number(q.hours)<Number(q.target)?'danger-tag':''}">${Number(q.hours)>=Number(q.target)?'Quote erfüllt':'Quote nicht erfüllt'}</span></div>${canEdit()?`<button onclick="deleteItem('quotas',${i})">Entfernen</button>`:''}</div>`);
+ rows('strikeList',state.strikes??[],(x,i)=>`<div class="feature-row"><div><b>${esc(x.member)} · ${x.count}/2 Strikes</b><div><small>${esc(x.reason)} · ${esc(x.by)} · ${esc(x.at)}</small></div><span class="tag ${x.count>=2?'danger-tag':''}">${x.count>=2?'2-Strikes-Grenze erreicht':'Verwarnungsstand'}</span></div>${canEdit()?`<button class="danger" onclick="deleteItem('strikes',${i})">Aufheben</button>`:''}</div>`);
+ rows('taskList',state.tasks??[],(x,i)=>`<div class="feature-row"><div><b>${esc(x.title)}</b><div><small>${esc(x.assignee)} · Fällig: ${esc(x.due||'Nicht festgelegt')}</small></div><div>${esc(x.detail)}</div><span class="tag">${esc(x.status)}</span></div>${canEdit()?`<button onclick="cycleTask(${i})">Status ändern</button><button class="danger" onclick="deleteItem('tasks',${i})">Löschen</button>`:''}</div>`);
+ rows('linksList',state.links??[],(x,i)=>`<div class="feature-row"><div><b>${esc(x.title)}</b><div><small>${esc(x.category)}</small></div><a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.url)}</a></div>${canEdit()?`<button class="danger" onclick="deleteItem('links',${i})">Entfernen</button>`:''}</div>`);
+ rows('applicationList',state.applications??[],(x,i)=>`<div class="feature-row"><div><b>${esc(x.title)}</b><div><small>${esc(x.deadline||'Ohne Frist')} · ${esc(x.status)}</small></div><div>${esc(x.description)}</div>${x.url?`<a href="${esc(x.url)}" target="_blank" rel="noopener">Zur Anmeldung</a>`:''}</div>${canEdit()?`<button onclick="editApplication(${i})">Bearbeiten</button><button class="danger" onclick="deleteItem('applications',${i})">Löschen</button>`:''}</div>`);
+ const rules=document.getElementById('kskRules');if(rules)rules.textContent=state.kskRules||'Noch keine Regeln hinterlegt.';
+ const perms=state.perms||{};document.querySelectorAll('.tab').forEach(b=>{const k=b.dataset.tab;const allowedNow= k==='tickets'?((perms[role]||{}).tickets||isChief()):allowed(k);b.classList.toggle('hidden',!allowedNow)});
+}
+async function addReport(){if(!needEdit())return;let title=prompt('Titel des Berichts:');if(!title)return;let category=prompt('Kategorie (Einsatz / Dienst / Ausbildung / Sonstiges):','Einsatz');let body=prompt('Berichtstext:');if(!body)return;state.reports??=[];state.reports.unshift({title,category,body,by:window.currentUsername||role,at:stamp()});logAction('Bericht erstellt',title);await saveAll();}
+async function createTicket(){let title=prompt('Betreff der Beschwerde:');if(!title)return;let description=prompt('Beschreibe dein Anliegen:');if(!description)return;state.tickets??=[];state.tickets.unshift({id:Date.now(),title,description,author:window.currentUsername||"Gast",status:"Offen",messages:[],at:stamp()});await saveAll();renderFeatures();toast('Beschwerde wurde lokal eingetragen.');}
+let activeTicket=null;function openTicket(id){activeTicket=id;const t=(state.tickets||[]).find(x=>x.id===id);if(!t)return;document.getElementById('ticketChat').classList.remove('hidden');document.getElementById('ticketChatTitle').textContent='#'+id+' · '+t.title;document.getElementById('chatMessages').innerHTML=(t.messages||[]).map(m=>`<div class="chat-msg ${m.by===(window.currentUsername||'')?'mine':''}"><b>${esc(m.by)}</b><div>${esc(m.body)}</div><small>${esc(m.at)}</small></div>`).join('');}
+async function sendTicketReply(){if(!activeTicket)return;const body=document.getElementById('chatReply').value.trim();if(!body)return;const t=(state.tickets||[]).find(x=>x.id===activeTicket);if(!t)return;t.messages??=[];t.messages.push({by:window.currentUsername||"Gast",body,at:stamp()});document.getElementById('chatReply').value='';await saveAll();openTicket(activeTicket);}
+async function closeTicket(id){if(!((state.perms[role]||{}).tickets||isChief()))return toast('Keine Berechtigung.');const t=(state.tickets||[]).find(x=>x.id===id);if(t)t.status=t.status==='Geschlossen'?'Offen':'Geschlossen';await saveAll();renderFeatures();}
+async function addQuota(){if(!needEdit())return;let member=prompt('Mitglied / Discord-Name:');if(!member)return;let week=prompt('Kalenderwoche:');let hours=prompt('Geleistete Ingame-Stunden:');let target=prompt('Erforderliche Wochenquote in Stunden:','3');if([week,hours,target].some(x=>x===null||x.trim()==='')||![hours,target].every(x=>Number.isFinite(Number(x))))return toast('Bitte gültige Zahlen eintragen.');state.quotas??=[];state.quotas.unshift({member,week,hours,target});logAction('Wochenquote eingetragen',member+' · '+hours+' h');await saveAll();}
+async function addStrike(){if(!needEdit())return;let member=prompt('Mitglied:');if(!member)return;let reason=prompt('Begründung:');if(!reason)return;state.strikes??=[];let count=state.strikes.filter(x=>x.member.toLowerCase()===member.toLowerCase()).reduce((n,x)=>n+1,0)+1;state.strikes.unshift({member,reason,count:Math.min(2,count),by:window.currentUsername||role,at:stamp()});logAction('Strike vergeben',member+' · '+count+'/2');if(count>=2){state.removedMembers??=[];state.removedMembers.push({member,reason:'Zwei-Strikes-Regel',at:stamp()});toast('Zwei Strikes erreicht: Portalzugang muss durch die Administration gesperrt werden.');}await saveAll();}
+async function addTask(){if(!needEdit())return;let title=prompt('Aufgabe:');if(!title)return;let detail=prompt('Beschreibung:')||'';let assignee=prompt('Zuständig:','KSK');let due=prompt('Fälligkeitsdatum (optional):','');state.tasks??=[];state.tasks.unshift({title,detail,assignee,due,status:'Offen'});logAction('KSK-Aufgabe erstellt',title);await saveAll();}
+async function cycleTask(i){if(!needEdit())return;let a=['Offen','In Bearbeitung','Erledigt'];let t=state.tasks[i];t.status=a[(a.indexOf(t.status)+1)%a.length];await saveAll();}
+async function addLink(){if(!needEdit())return;let title=prompt('Linkname:');if(!title)return;let url=prompt('Vollständige URL (https://…):');if(!url)return;if(!/^https?:\/\//i.test(url))return toast('Bitte eine vollständige http(s)-Adresse eingeben.');let category=prompt('Kategorie:','Handbuch');state.links??=[];state.links.unshift({title,url,category});await saveAll();}
+async function addApplication(){if(!isChief())return toast('Nur die Kompanieführung darf Anmeldungen erstellen.');let title=prompt('Name der Anmeldung:');if(!title)return;let description=prompt('Beschreibung:')||'';let url=prompt('Externer Formularlink (optional):','')||'';let deadline=prompt('Bewerbungsfrist (optional):','')||'';state.applications??=[];state.applications.unshift({title,description,url,deadline,status:'Aktiv'});logAction('Anmeldung veröffentlicht',title);await saveAll();}
+async function editApplication(i){if(!isChief())return;let a=state.applications[i];let st=prompt('Status (Aktiv / Pausiert / Geschlossen):',a.status);if(st===null)return;a.status=st;await saveAll();}
+async function editKskRules(){if(!needEdit())return;let v=prompt('KSK-Regeln / interne Hinweise:',state.kskRules||'');if(v===null)return;state.kskRules=v;await saveAll();}
+async function deleteItem(key,i){if(!needEdit())return;if(!confirm('Eintrag wirklich entfernen?'))return;state[key].splice(i,1);logAction('Eintrag gelöscht',key);await saveAll();}
+const theoryBank=[
+['Eine Weisung widerspricht einer geltenden Dienstvorschrift. Wie gehst du vor?',['Ungeprüft ausführen','Widerspruch sachlich ansprechen und über den Dienstweg klären','Öffentlich ignorieren','Eigenmächtig eine neue Vorschrift erlassen'],1],
+['Welche Angaben gehören zwingend in einen nachvollziehbaren Einsatzbericht?',['Nur den Namen des Einsatzleiters','Zeit, Ort, Beteiligte, Ablauf und sachliche Feststellungen','Nur eine Bewertung','Nur Screenshots ohne Erklärung'],1],
+['Ein Mitglied meldet einen Regelverstoß gegen eine Führungskraft. Was ist angemessen?',['Meldung wegen Rangunterschied ignorieren','Sachlich dokumentieren und zuständige unabhängige Stelle einbeziehen','Sofort öffentlich verurteilen','Die beschuldigte Person selbst entscheiden lassen'],1],
+['Warum ist das Vier-Augen-Prinzip bei sensiblen Entscheidungen sinnvoll?',['Es beschleunigt jede Entscheidung','Es verbessert Kontrolle und Nachvollziehbarkeit','Es ersetzt jede Dokumentation','Es verhindert Rückfragen'],1],
+['Ein Fahrauftrag ist unvollständig. Was ist der richtige Schritt?',['Trotzdem freigeben','Fehlende Angaben nachfordern und bis dahin offen lassen','Daten schätzen','Einfach löschen'],1],
+['Wie werden vertrauliche Beschwerden behandelt?',['Im öffentlichen Chat teilen','Nur berechtigten Personen zugänglich machen und sachlich bearbeiten','An alle Mitglieder weiterleiten','Ohne Prüfung schließen'],1],
+['Was ist bei einer Rollenänderung zu dokumentieren?',['Nur die neue Farbe','Alte und neue Rolle, Zeitpunkt und verantwortliche Stelle','Nichts','Nur den Discord-Namen'],1],
+['Ein Bericht enthält Vermutungen statt gesicherter Fakten. Wie kennzeichnest du das?',['Als bewiesene Tatsache','Als unbestätigte Angabe und getrennt von Feststellungen','Gar nicht','Du entfernst alle Fakten'],1],
+['Welche Priorität hat die Sicherheit von RP-Mitgliedern?',['Sie ist zweitrangig','Sie hat Vorrang vor Spielzielen und Zeitdruck','Nur bei Events relevant','Sie gilt nur für Führungskräfte'],1],
+['Ein Mitglied hat zwei gültige Strikes. Was muss vor einer Sanktion geprüft werden?',['Ob es beliebt ist','Ob beide Einträge nachvollziehbar, korrekt zugeordnet und nach Regelwerk gültig sind','Ob andere ebenfalls Strikes haben','Nichts'],1],
+['Wie reagierst du auf eine unklare Funkmeldung?',['Raten und handeln','Rückfrage stellen und Meldung bestätigen lassen','Funkkanal verlassen','Meldung ignorieren'],1],
+['Welche Aussage beschreibt den Dienstweg korrekt?',['Jede Meldung muss öffentlich sein','Anliegen werden grundsätzlich über die zuständigen Ebenen weitergegeben','Der Dienstweg darf nie hinterfragt werden','Nur Führungskräfte dürfen Fragen stellen'],1],
+['Was gehört in eine faire Beschwerdeentscheidung?',['Persönliche Sympathie','Anhörung, Faktenprüfung, Regelgrundlage und begründete Entscheidung','Nur die Aussage der ranghöchsten Person','Sofortige Bestrafung'],1],
+['Ein Mitglied ist online, aber nicht im Dienst. Was darfst du daraus schließen?',['Es erfüllt automatisch die Quote','Online-Status allein belegt keine aktive Dienstzeit','Es muss sofort bestraft werden','Es ist automatisch abwesend'],1],
+['Warum sollte ein Handbuch versioniert werden?',['Damit alte Regeln unsichtbar werden','Damit Änderungen und gültiger Stand nachvollziehbar bleiben','Damit niemand es lesen kann','Nur aus optischen Gründen'],1],
+['Eine Führungskraft bittet dich, einen Bericht nachträglich zu verändern. Was ist korrekt?',['Änderung ohne Hinweis durchführen','Änderung transparent mit Grund und Zeitstempel dokumentieren','Original überschreiben und Spuren entfernen','Bericht löschen'],1],
+['Wie wird ein Interessenkonflikt behandelt?',['Verschweigen','Offenlegen und eine unbefangene Stelle entscheiden lassen','Selbst über den eigenen Fall urteilen','Die Beschwerde schließen'],1],
+['Was ist bei personenbezogenen Daten zu beachten?',['So viele Daten wie möglich sammeln','Nur notwendige Daten zweckgebunden und zugriffsbeschränkt verwenden','Alle Daten veröffentlichen','Daten dauerhaft behalten'],1],
+['Ein Mitglied bestreitet einen Vorwurf. Was ist angemessen?',['Keine Anhörung zulassen','Stellungnahme ermöglichen und Belege prüfen','Vorwurf automatisch als wahr ansehen','Öffentlich abstimmen lassen'],1],
+['Was bedeutet eine klare Aufgabenverteilung?',['Mehrere Personen glauben, zuständig zu sein','Verantwortliche, Frist und Ergebnis sind eindeutig festgelegt','Niemand muss berichten','Aufgaben bleiben mündlich'],1],,
+['Ein Mitglied meldet einen Vorfall, kann aber den genauen Zeitpunkt nicht nennen. Wie dokumentierst du das?',['Zeitpunkt schätzen und als Tatsache eintragen','Zeitangabe als unbekannt kennzeichnen und verfügbare Anhaltspunkte notieren','Den Bericht ablehnen','Einen beliebigen Zeitpunkt eintragen'],1],
+['Zwei Dienststellen geben widersprüchliche Anweisungen. Was ist der sauberste nächste Schritt?',['Beide gleichzeitig ausführen','Zuständigkeit klären und eine bestätigte Entscheidung über den Dienstweg einholen','Die eigene Lieblingsanweisung wählen','Den Konflikt im öffentlichen Chat austragen'],1],
+['Warum ist eine Trennung von Beobachtung und Bewertung wichtig?',['Damit Berichte länger werden','Damit Fakten und persönliche Einschätzungen nicht verwechselt werden','Damit keine Rückfragen möglich sind','Damit Entscheidungen ohne Belege getroffen werden'],1],
+['Ein Ticket enthält sensible Informationen über Dritte. Was ist zu tun?',['In einen öffentlichen Kanal kopieren','Zugriff beschränken und nur erforderliche Angaben bearbeiten','Allen Führungskräften ungefragt schicken','Als Unterhaltung speichern'],1],
+['Ein Fahrauftrag wird zeitlich überschritten. Was sollte eingetragen werden?',['Nichts, wenn das Fahrzeug zurückkommt','Tatsächliche Rückkehrzeit und nachvollziehbarer Grund','Eine geplante Zeit beibehalten','Den Auftrag ohne Hinweis löschen'],1],
+['Ein Mitglied möchte eine Entscheidung anfechten. Welche Grundlage ist entscheidend?',['Rang und Beliebtheit','Dokumentierte Fakten, geltende Regeln und ein geregeltes Beschwerdeverfahren','Mehrheit im Chat','Persönliche Beziehung'],1],
+['Eine Vorschrift wurde aktualisiert. Wie stellst du sicher, dass alle den gültigen Stand finden?',['Alte Datei weiter oben anheften','Version, Datum und Änderungshinweis sichtbar machen','Nur mündlich Bescheid geben','Alle alten Versionen unmarkiert lassen'],1],
+['Ein Mitglied erhält versehentlich zu hohe Rechte. Was ist die richtige Reaktion?',['Abwarten','Fehler sofort korrigieren, Zugriff prüfen und Änderung protokollieren','Die Rechte öffentlich diskutieren','Das Konto dauerhaft löschen ohne Prüfung'],1],
+['Welche Information gehört nicht in einen öffentlichen Einsatzbericht?',['Sachlicher Ablauf','Erforderliche dienstliche Feststellungen','Unnötige private oder vertrauliche Angaben','Zeitlicher Ablauf'],2],
+['Wie sollte eine Frist in einer Aufgabenliste geführt werden?',['Nur als ungefähre Erinnerung','Mit eindeutigem Datum und verantwortlicher Person','Ohne Zuständigkeit','Nur im Kopf des Erstellers'],1],
+['Eine Beschwerde betrifft die Person, die normalerweise Tickets bearbeitet. Was ist sinnvoll?',['Die Person entscheidet selbst','Eine unbeteiligte berechtigte Stelle übernimmt die Prüfung','Ticket automatisch schließen','Beschwerde öffentlich abstimmen'],1],
+['Warum dürfen Rollen-Codes nicht mehrfach verwendet werden?',['Damit Codes komplizierter aussehen','Damit Weitergabe und Einlösung kontrollierbar bleiben','Damit Rollen geheim bleiben','Damit Mitglieder keine Rolle erhalten'],1],
+['Was ist bei einer Personalakte besonders wichtig?',['Zugriff für alle Mitglieder','Zweckbindung, korrekte Angaben und begrenzte Zugriffsrechte','Beliebige Kommentare','Keine Aktualisierung'],1],
+['Ein Einsatzbericht wird nachträglich ergänzt. Wie bleibt er nachvollziehbar?',['Alten Text still überschreiben','Ergänzung mit Zeitpunkt und Bearbeiter kennzeichnen','Den ursprünglichen Bericht löschen','Die Änderung nicht speichern'],1],
+['Eine Person ist für eine Aufgabe eingetragen, aber nicht verfügbar. Was ist zu tun?',['Aufgabe unerledigt lassen','Vertretung festlegen und Zuständigkeit aktualisieren','Aufgabe ohne Rückmeldung schließen','Alle Aufgaben neu verteilen'],1],
+['Welche Aussage zur Wochenquote ist korrekt?',['Portal-Onlinezeit entspricht automatisch Ingame-Dienstzeit','Die erfassten Stunden müssen nachvollziehbar und als Ingame-Zeit gekennzeichnet sein','Jeder Login zählt als volle Stunde','Schätzungen sind immer ausreichend'],1],
+['Wie gehst du mit einer offensichtlich falschen Eintragung um?',['Unbemerkt überschreiben','Korrektur mit Begründung und nachvollziehbarem Änderungsvermerk durchführen','Ignorieren','Den Ersteller öffentlich bloßstellen'],1],
+['Warum ist ein Status wie „In Bearbeitung“ hilfreich?',['Er ersetzt eine Aufgabenbeschreibung','Er zeigt den Fortschritt und verhindert doppelte Arbeit','Er macht Fristen überflüssig','Er bedeutet automatisch erledigt'],1],
+['Eine Person bittet um Einsicht in ein Ticket, ist aber nicht berechtigt. Was gilt?',['Ticket trotzdem zeigen','Zugriff verweigern und an zuständige Stelle verweisen','Screenshots senden','Nur den Chatverlauf zeigen'],1],
+['Ein Bericht enthält zwei unterschiedliche Zeugenaussagen. Wie gehst du vor?',['Eine Aussage ohne Prüfung auswählen','Beide Aussagen getrennt und neutral dokumentieren','Die Aussagen zusammenmischen','Eine Person zum Löschen auffordern'],1],
+['Was bedeutet „Need-to-know“ bei internen Informationen?',['Jeder darf alles sehen','Zugriff nur für Personen, die die Information für ihre Aufgabe benötigen','Nur die ranghöchste Person darf lesen','Informationen müssen veröffentlicht werden'],1],
+['Eine Rolle wird umbenannt. Was muss geprüft werden?',['Nur die Anzeige im Organigramm','Zugeordnete Berechtigungen, Rollencodes und bestehende Mitgliederzuweisungen','Nur die Farbe','Nichts'],1],
+['Ein Antrag ist unvollständig und die Frist läuft bald ab. Was ist angemessen?',['Automatisch genehmigen','Fehlende Angaben mit Frist nachfordern und Status dokumentieren','Antrag kommentarlos löschen','Frist selbst rückdatieren'],1],
+['Warum sollten Ablehnungen begründet werden?',['Damit sie härter wirken','Damit Antragsteller die Entscheidung nachvollziehen und gegebenenfalls prüfen lassen können','Damit keine Dokumentation nötig ist','Nur für die Statistik'],1],
+['Was ist ein geeigneter Umgang mit einem Systemfehler?',['Fehler verbergen','Fehlerbild, Zeitpunkt und betroffene Funktion dokumentieren und melden','Alle Daten löschen','Ungeprüft weiterarbeiten'],1],
+['Ein Mitglied erfüllt die Quote knapp nicht. Was ist vor einer Maßnahme zu prüfen?',['Ob es beliebt ist','Ob Sollwert, Zeitraum und erfasste Ingame-Zeit korrekt sind','Ob es oft online war','Ob jemand anderes weniger aktiv war'],1],
+['Warum ist ein zentraler Link-Katalog sinnvoll?',['Er macht Rechte überflüssig','Er bündelt aktuelle Ressourcen und reduziert veraltete Verweise','Er ersetzt die Handbücher','Er verhindert Änderungen'],1],
+['Ein Teamleiter möchte einen Fall selbst bewerten, an dem er beteiligt war. Was ist korrekt?',['Selbst entscheiden','Interessenkonflikt offenlegen und unabhängige Prüfung veranlassen','Fall ignorieren','Nur mit Freunden abstimmen'],1],
+['Welche Angabe ist für die Nachvollziehbarkeit einer Entscheidung besonders wichtig?',['Lieblingsfarbe des Bearbeiters','Entscheidungsgrundlage, zuständige Person und Zeitpunkt','Anzahl der Emojis','Unbeteiligte Meinungen'],1],
+['Wie wird verhindert, dass ein erledigter Auftrag versehentlich erneut bearbeitet wird?',['Status entfernen','Status „Erledigt“ und Abschlussdatum setzen','Auftrag offen lassen','Titel ändern'],1]
+]
+// Ergänzende Varianten halten die Prüfung auf maximal 50 Fragen; jede Frage wird einzeln bewertet.
+const theoryQuestions=theoryBank.slice(0,50).map(q=>({q:q[0],a:q[1],c:q[2]}));
+const drivingBank=[
+['Was ist vor Fahrtantritt zuerst zu prüfen?',['Fahrzeugzustand und Verkehrssicherheit','Nur die Musik','Nur die Lackierung'],0],['Wie verhältst du dich bei schlechter Sicht?',['Geschwindigkeit anpassen und Abstand vergrößern','Dicht auffahren','Fernlicht dauerhaft bei Gegenverkehr'],0],['Was bedeutet ein rotes Lichtzeichen?',['Anhalten','Beschleunigen','Nur hupen'],0],['Wie reagierst du bei Aquaplaning?',['Gas wegnehmen, Lenkrad ruhig halten','Stark bremsen und ruckartig lenken','Beschleunigen'],0],['Wann ist der Sicherheitsabstand zu vergrößern?',['Bei Nässe und schlechter Sicht','Nur nachts auf leerer Straße','Nie'],0],['Was gilt an einem Stoppschild?',['Anhalten und Vorfahrt beachten','Nur langsamer werden','Nur anhalten, wenn jemand hupt'],0],['Wie verhältst du dich an einem Fußgängerüberweg?',['Vorsichtig heranfahren und querende Personen passieren lassen','Überholen','Beschleunigen'],0],['Was ist bei einem Reifenplatzer wichtig?',['Lenkrad festhalten und kontrolliert abbremsen','Sofort stark lenken','Vollgas geben'],0],['Wann darfst du ein Mobiltelefon während der Fahrt bedienen?',['Nicht in der Hand während der Fahrt','Immer an der Ampel','Bei geringer Geschwindigkeit'],0],['Was bedeutet eine durchgezogene Linie?',['Sie darf grundsätzlich nicht überfahren werden','Sie ist nur Dekoration','Sie gilt nur für LKW'],0]
+];
+const drivingQuestions=drivingBank.slice(0,50).map(q=>({q:q[0],a:q[1],c:q[2]}));
+const baseTheoryQuestions=[...theoryQuestions],baseDrivingQuestions=[...drivingQuestions];
+let currentTest=null;
+function renderTest(kind){const qs=kind==='theory'?theoryQuestions:drivingQuestions;const root=document.getElementById(kind==='theory'?'theoryArea':'drivingArea');root.classList.remove('hidden');root.innerHTML=`<div class="feature-muted">${qs.length} Fragen · Bitte jede Frage beantworten.</div><form id="${kind}Form">${qs.map((q,i)=>`<div class="test-question"><b>${i+1}. ${esc(q.q)}</b>${q.a.map((a,j)=>`<label><input type="radio" name="q${i}" value="${j}" required> ${esc(a)}</label>`).join('')}</div>`).join('')}<button class="primary" type="submit">Prüfung verbindlich abgeben</button></form>`;document.getElementById(kind+'Form').onsubmit=e=>{e.preventDefault();finishTest(kind,qs)};}
+function addExamQuestion(kind){if(!needEdit())return;const q=prompt('Frage:');if(!q)return;const opts=[];for(let i=1;i<=4;i++){const v=prompt('Antwort '+i+':');if(!v)return;opts.push(v)}const correct=Number(prompt('Nummer der richtigen Antwort (1–4):','1'))-1;if(!Number.isInteger(correct)||correct<0||correct>3)return toast('Ungültige Antwortnummer.');const key=kind==='theory'?'customTheory':'customDriving';state[key]??=[];if(state[key].length>=50)return toast('Maximal 50 eigene Fragen.');state[key].push({q,a:opts,c:correct});saveAll();}
+function startTheory(){const custom=(state.customTheory||[]).slice(0,50);theoryQuestions.splice(0,theoryQuestions.length,...baseTheoryQuestions.slice(0,50-custom.length),...custom);renderTest('theory')}function startDriving(){const custom=(state.customDriving||[]).slice(0,50);drivingQuestions.splice(0,drivingQuestions.length,...baseDrivingQuestions.slice(0,50-custom.length),...custom);renderTest('driving')}
+async function finishTest(kind,qs){let errors=0,points=0;qs.forEach((q,i)=>{const v=document.querySelector(`input[name="q${i}"]:checked`);if(!v||Number(v.value)!==q.c){errors++;points--; }else points++;});if(kind==='theory')points=qs.length-errors;const passed=kind==='driving'?errors<=10:points>=Math.ceil(qs.length*.8);const result={name:window.currentUsername||'Mitglied',date:stamp(),points,errors,total:qs.length,passed};const key=kind==='theory'?'testResults':'drivingResults';state[key]??=[];state[key].unshift(result);logAction(kind==='theory'?'Theorieprüfung abgelegt':'Fahrprüfung abgelegt',`${result.name}: ${points} Punkte, ${errors} Fehler`);await saveAll();document.getElementById(kind==='theory'?'theoryArea':'drivingArea').classList.add('hidden');renderTestResults(kind);toast(passed?'Prüfung bestanden.':'Prüfung nicht bestanden.');}
+function renderTestResults(kind){const arr=state[kind==='theory'?'testResults':'drivingResults']||[];const id=kind==='theory'?'theoryResults':'drivingResults';document.getElementById(id).innerHTML=arr.map(x=>`<div class="feature-row"><div><b>${esc(x.name)} · ${x.passed?'Bestanden':'Nicht bestanden'}</b><div><small>${esc(x.date)} · ${x.points} Punkte · ${x.errors} Fehler von ${x.total}</small></div></div><span class="tag ${x.passed?'':'danger-tag'}">${x.passed?'Bestanden':'Nicht bestanden'}</span></div>`).join('')||'<div class="feature-muted">Noch keine Prüfungsergebnisse.</div>'}
+// Initialisierung: die neuen Bereiche werden nach jedem Datenabruf mitgerendert.
+const _oldRenderAll=renderAll;
+
+
+async function createPortalRole(){if(!isChief())return toast('Nur die Kompanieführung darf Rollen erstellen.');const name=prompt('Name der neuen Portalrolle:');if(!name)return;const keys=['org','members','requests','vehicles','manuals','permissions','edit','reports','tickets','quota','strikes','tests','driving','ksk','links'];const labels={org:'Organigramm',members:'Mitglieder',requests:'Dienstanträge',vehicles:'Fahraufträge',manuals:'Handbücher',permissions:'Berechtigungen verwalten',edit:'Daten bearbeiten',reports:'Berichte & Logs',tickets:'Beschwerden einsehen',quota:'Wochenquote',strikes:'Strikes',tests:'Theorieprüfung',driving:'Fahrprüfung',ksk:'KSK-Aufgaben',links:'Linksammlung'};const permissions={};for(const k of keys)permissions[k]=confirm('Darf die Rolle diesen Bereich nutzen: '+labels[k]+'?');state.perms[name]=permissions;const opt=document.createElement('option');opt.textContent=name;document.getElementById('codeRole').append(opt);await saveAll();toast('Rolle '+name+' wurde erstellt.');}
+
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script>
+const SB=supabase.createClient("https://baxqbnchlatzlbkponau.supabase.co","sb_publishable_DaQdg7Wh9wJSvTEJyoxo7w_vnK4AhRE");
+const KEYS=["org","members","requests","docs","vehicles","perms","reports","tickets","quotas","strikes","tasks","links","applications","testResults","drivingResults","audit","kskRules"];
+let ME=null,PROFILES=[],LAST={},SYNCING=false;
+const $=id=>document.getElementById(id);
+const canon=o=>JSON.stringify(o,(k,v)=>v&&typeof v==="object"&&!Array.isArray(v)?Object.keys(v).sort().reduce((a,c)=>(a[c]=v[c],a),{}):v);
+const hexOf=t=>Array.from(new TextEncoder().encode(t)).map(b=>b.toString(16).padStart(2,"0")).join("");
+const emailOf=u=>"f"+hexOf(u.toLowerCase().replace(/\s+/g,""))+"@fj-portal.app";
+const dem=$("activeRole");if(dem&&dem.closest(".field"))dem.closest(".field").remove();
+async function pullAll(){
+ const [d,p]=await Promise.all([SB.from("fj_data").select("key,data"),SB.from("fj_profiles").select("id,username,role,last_seen")]);
+ if(d.error||p.error){toast("Verbindung zum Server fehlgeschlagen.");return false}
+ PROFILES=p.data;ME=PROFILES.find(x=>x.id===ME.id)||ME;role=ME.role;
+ const rows={};d.data.forEach(r=>rows[r.key]=r.data);
+ KEYS.forEach(k=>{if(k in rows)state[k]=rows[k]});
+ state.orgLayoutVersion=2;if(!state.vehicles)state.vehicles=[];
+ state.perms={...defaultPerms,...(state.perms||{})};
+ const chief=role==="Kompanieführung";
+ for(const k of KEYS){LAST[k]=canon(state[k]);
+  if(chief&&state[k]!==undefined&&(!(k in rows)||(k==="perms"&&canon(state.perms)!==canon(rows.perms))))await SB.from("fj_data").upsert({key:k,data:state[k]})}
+ return true}
+async function syncOut(){
+ SYNCING=true;
+ for(const k of KEYS){if(state[k]===undefined)continue;const j=canon(state[k]);if(j===LAST[k])continue;
+  const {error}=await SB.from("fj_data").upsert({key:k,data:state[k]});
+  if(error){toast("Nicht gespeichert: keine Berechtigung oder keine Verbindung.");await pullAll();SYNCING=false;renderTabs();renderAll();return}
+  LAST[k]=j}
+ SYNCING=false;toast("Änderungen gespeichert.")}
+async function saveAll(){if(!state.vehicles)state.vehicles=[];renderAll();await syncOut()}
+function loggedOutUI(){role="Gast";window.currentUsername="";$("roleChip").textContent="Nicht angemeldet";$("authUser").textContent="";$("loginBtn").classList.remove("hidden");$("logoutBtn").classList.add("hidden");$("loginOverlay").classList.add("show");renderTabs();renderAll()}
+function afterLogin(){role=ME.role;window.currentUsername=ME.username;$("roleChip").textContent="Rolle: "+role;$("authUser").textContent=ME.username;$("loginBtn").classList.add("hidden");$("logoutBtn").classList.remove("hidden");$("loginOverlay").classList.remove("show");renderTabs();renderAll();renderOnlineMembers();refreshMembers();const cp=$("codePanel");if(cp)cp.classList.toggle("hidden",!((state.perms[role]||{}).permissions))}
+async function portalBootstrap(){if(ME)afterLogin();else loggedOutUI()}
+async function enter(){
+ const {data:{session}}=await SB.auth.getSession();if(!session)return false;
+ const pr=await SB.from("fj_profiles").select("id,username,role,last_seen").eq("id",session.user.id).single();
+ if(pr.error){await SB.auth.signOut();return false}
+ ME=pr.data;if(!(await pullAll()))return false;
+ await SB.rpc("fj_touch");afterLogin();return true}
+async function login(){
+ const u=$("loginName").value.trim().replace(/\s+/g," "),p=$("loginPass").value,err=$("loginError");err.textContent="";
+ if(!u||!p){err.textContent="Bitte Benutzername und Passwort eingeben.";return}
+ const {error}=await SB.auth.signInWithPassword({email:emailOf(u),password:p});
+ if(error){err.textContent="Benutzername oder Passwort falsch.";return}
+ if(await enter())toast("Willkommen, "+ME.username+"!");else err.textContent="Anmeldung nicht möglich. Bitte erneut versuchen."}
+async function registerAccount(){
+ const u=$("loginName").value.trim().replace(/\s+/g," "),p=$("loginPass").value,err=$("loginError");err.textContent="";
+ if(u.length<3||!p){err.textContent="Bitte Benutzername (mind. 3 Zeichen) und Passwort eingeben.";return}
+ if(!$("fjTerms").checked){err.textContent="Bitte stimme der Nutzungsvereinbarung zu.";return}
+ if(p.length<6){err.textContent="Das Passwort muss mindestens 6 Zeichen lang sein.";return}
+ const {error}=await SB.auth.signUp({email:emailOf(u),password:p,options:{data:{username:u,portal:"fj"}}});
+ if(error){err.textContent=/registered|exists|duplicate/i.test(error.message)?"Der Benutzername ist bereits vergeben.":"Registrierung fehlgeschlagen: "+error.message;return}
+ if(await enter())toast("Willkommen, "+ME.username+"!");else err.textContent="Konto erstellt. Bitte jetzt anmelden."}
+async function logoutLocal(){await SB.auth.signOut();location.reload()}
+function redeemRoleCode(){if(!ME){toast("Bitte melde dich zuerst an.");return}openModal("Rollen-Code einlösen",`<p class="muted small">Gib deinen persönlichen Rollen-Code ein.</p><div class="field"><label>Rollen-Code</label><input id="roleCodeInput" autocomplete="off" placeholder="Code eingeben" onkeydown="if(event.key==='Enter')submitRoleCode()"></div><div class="toolbar"><button class="primary" onclick="submitRoleCode()">Code bestätigen</button><button class="ghost" onclick="closeModal()">Abbrechen</button></div><div id="roleCodeError" class="small" style="color:#ff9c86;margin-top:10px"></div>`)}
+async function submitRoleCode(){
+ const f=$("roleCodeInput"),err=$("roleCodeError");if(!f)return;const c=f.value.trim();if(!c){err.textContent="Bitte gib einen Code ein.";return}
+ const {data,error}=await SB.rpc("fj_redeem_code",{c});
+ if(error){err.textContent="Code ungültig oder bereits eingelöst.";return}
+ closeModal();await pullAll();afterLogin();toast("Deine neue Rolle: "+data)}
+async function createRoleCode(){
+ if(!isChief())return toast("Nur die Kompanieführung darf Codes erstellen.");
+ const siteRole=$("codeRole").value;const {data:code,error}=await SB.rpc("fj_create_code",{new_role:siteRole});
+ if(error)return toast("Code konnte nicht erstellt werden.");
+ const box=$("newCodeResult");box.classList.remove("hidden");box.innerHTML=`Code für <b>${esc(siteRole)}</b>: <code style="font-size:17px;color:#ffd18a">${esc(code)}</code> <button onclick="navigator.clipboard.writeText('${esc(code)}')">Kopieren</button>`}
+async function refreshMembers(){
+ const el=$("portalMemberRows");if(!el)return;
+ el.innerHTML=PROFILES.length?PROFILES.map(m=>`<tr><td>${esc(m.username)}</td><td><span class="pill">${esc(m.role)}</span></td><td>${isChief()&&m.id!==ME.id?`<button class="ghost" data-u="${esc(m.username)}" onclick="changeMemberRole(this.dataset.u)">Rolle ändern</button> <button class="ghost" data-u="${esc(m.username)}" onclick="deleteAccount(this.dataset.u)">Löschen</button>`:"Online-Konto"}</td><td>${m.last_seen?new Date(m.last_seen).toLocaleString("de-DE"):"–"}</td></tr>`).join(""):'<tr><td colspan="4" class="empty">Noch keine Mitglieder.</td></tr>'}
+async function renderOnlineMembers(){
+ const on=PROFILES.filter(m=>m.last_seen&&Date.now()-new Date(m.last_seen)<5*60000),root=$("onlineMembers"),c=$("onlineCount");
+ if(root)root.innerHTML=on.length?on.map(m=>`<div class="muted small">${esc(m.username)} · ${esc(m.role)}</div>`).join(""):'<div class="muted small">Niemand online.</div>';
+ if(c)c.textContent=on.length+" online"}
+async function changeMemberRole(username){
+ if(!isChief())return;const options=Object.keys(defaultPerms);
+ const next=prompt("Neue Rolle für "+username+":\n"+options.join("\n"));if(!next)return;
+ if(!options.includes(next))return toast("Diese Rolle existiert nicht.");
+ const {error}=await SB.rpc("fj_set_role",{target:username,new_role:next});
+ toast(error?"Nicht erlaubt: "+error.message:"Rolle geändert.");await pullAll();refreshMembers();renderOnlineMembers()}
+async function deleteAccount(name){
+ if(!isChief())return;if(!confirm("Konto „"+name+"“ endgültig löschen? Das kann nicht rückgängig gemacht werden."))return;
+ const {error}=await SB.rpc("fj_delete_account",{target:name});
+ toast(error?"Nicht gelöscht: "+error.message:"Konto gelöscht.");await pullAll();refreshMembers();renderOnlineMembers()}
+setInterval(async()=>{if(!ME||SYNCING||document.hidden)return;const a=document.activeElement;if(a&&/INPUT|TEXTAREA|SELECT/.test(a.tagName))return;await SB.rpc("fj_touch");if(await pullAll()){renderTabs();renderAll();renderOnlineMembers();refreshMembers()}},60000);
+loggedOutUI();enter().catch(()=>{});
+
+</script>
+</body></html>
